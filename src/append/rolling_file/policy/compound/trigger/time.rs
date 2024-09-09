@@ -2,8 +2,6 @@
 //!
 //! Requires the `time_trigger` feature.
 
-#[cfg(test)]
-use chrono::NaiveDateTime;
 use chrono::{DateTime, Datelike, Duration, Local, TimeZone, Timelike};
 #[cfg(test)]
 use mock_instant::{SystemTime, UNIX_EPOCH};
@@ -47,8 +45,11 @@ pub struct TimeTrigger {
 }
 
 /// The TimeTrigger supports the following units (case insensitive):
-/// "second", "seconds", "minute", "minutes", "hour", "hours", "day", "days", "week", "weeks", "month", "months", "year", "years". The unit defaults to
-/// second if not specified.
+///
+/// "second", "seconds", "minute", "minutes", "hour", "hours", "day",
+/// "days", "week", "weeks", "month", "months", "year", "years".
+///
+/// The unit defaults to second if not specified.
 #[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
 pub enum TimeTriggerInterval {
     /// TimeTriger in second(s).
@@ -181,8 +182,9 @@ impl TimeTrigger {
             let now: std::time::Duration = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .expect("system time before Unix epoch");
-            NaiveDateTime::from_timestamp_opt(now.as_secs() as i64, now.subsec_nanos())
+            DateTime::from_timestamp(now.as_secs() as i64, now.subsec_nanos())
                 .unwrap()
+                .naive_utc()
                 .and_local_timezone(Local)
                 .unwrap()
         };
@@ -283,8 +285,9 @@ impl Trigger for TimeTrigger {
             let now = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .expect("system time before Unix epoch");
-            NaiveDateTime::from_timestamp_opt(now.as_secs() as i64, now.subsec_nanos())
+            DateTime::from_timestamp(now.as_secs() as i64, now.subsec_nanos())
                 .unwrap()
+                .naive_utc()
                 .and_local_timezone(Local)
                 .unwrap()
         };
